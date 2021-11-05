@@ -96,8 +96,6 @@ func TestHelp(t *testing.T) {
 			t.Errorf("Expected flags.ErrHelp type, but got %s", e.Type)
 		}
 
-		fmt.Println(e)
-
 		var expected string
 
 		if runtime.GOOS == "windows" {
