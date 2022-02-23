@@ -27,59 +27,11 @@ func TestShortTooLong(t *testing.T) {
 	assertParseFail(t, ErrShortNameTooLong, "short names can only be 1 character long, not `vv'", &opts)
 }
 
-func TestShortRequired(t *testing.T) {
-	var opts = struct {
-		Value bool `short:"v" required:"true"`
-	}{}
-
-	assertParseFail(t, ErrRequired, fmt.Sprintf("the required flag `%cv' was not specified", defaultShortOptDelimiter), &opts)
-}
-
-func TestShortRequiredFalsy1(t *testing.T) {
-	var opts = struct {
-		Value bool `short:"v" required:"false"`
-	}{}
-
-	assertParseSuccess(t, &opts)
-}
-
-func TestShortRequiredFalsy2(t *testing.T) {
-	var opts = struct {
-		Value bool `short:"v" required:"no"`
-	}{}
-
-	assertParseSuccess(t, &opts)
-}
-
 func TestShortMultiConcat(t *testing.T) {
 	var opts = struct {
 		V bool `short:"v"`
 		O bool `short:"o"`
 		F bool `short:"f"`
-	}{}
-
-	ret := assertParseSuccess(t, &opts, "-vo", "-f")
-
-	assertStringArray(t, ret, []string{})
-
-	if !opts.V {
-		t.Errorf("Expected V to be true")
-	}
-
-	if !opts.O {
-		t.Errorf("Expected O to be true")
-	}
-
-	if !opts.F {
-		t.Errorf("Expected F to be true")
-	}
-}
-
-func TestShortMultiRequiredConcat(t *testing.T) {
-	var opts = struct {
-		V bool `short:"v" required:"true"`
-		O bool `short:"o" required:"true"`
-		F bool `short:"f" required:"true"`
 	}{}
 
 	ret := assertParseSuccess(t, &opts, "-vo", "-f")

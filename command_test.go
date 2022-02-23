@@ -1,7 +1,6 @@
 package flags
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -400,31 +399,6 @@ func TestCommandNestedInline(t *testing.T) {
 			t.Errorf("Expected to find command `nested' to be the active `cmd' command")
 		}
 	}
-}
-
-func TestRequiredOnCommand(t *testing.T) {
-	var opts = struct {
-		Value bool `short:"v" required:"true"`
-
-		Command struct {
-			G bool `short:"g"`
-		} `command:"cmd"`
-	}{}
-
-	assertParseFail(t, ErrRequired, fmt.Sprintf("the required flag `%cv' was not specified", defaultShortOptDelimiter), &opts, "cmd")
-}
-
-func TestRequiredAllOnCommand(t *testing.T) {
-	var opts = struct {
-		Value   bool `short:"v" required:"true"`
-		Missing bool `long:"missing" required:"true"`
-
-		Command struct {
-			G bool `short:"g"`
-		} `command:"cmd"`
-	}{}
-
-	assertParseFail(t, ErrRequired, fmt.Sprintf("the required flags `%smissing' and `%cv' were not specified", defaultLongOptDelimiter, defaultShortOptDelimiter), &opts, "cmd")
 }
 
 func TestAfterNonCommand(t *testing.T) {

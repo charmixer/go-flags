@@ -1,7 +1,7 @@
 go-flags: a go library for parsing command line arguments
 =========================================================
 
-[![GoDoc](https://godoc.org/github.com/jessevdk/go-flags?status.png)](https://godoc.org/github.com/jessevdk/go-flags) [![Build Status](https://travis-ci.org/jessevdk/go-flags.svg?branch=master)](https://travis-ci.org/jessevdk/go-flags) [![Coverage Status](https://img.shields.io/coveralls/jessevdk/go-flags.svg)](https://coveralls.io/r/jessevdk/go-flags?branch=master)
+[![GoDoc](https://godoc.org/github.com/charmixer/go-flags?status.png)](https://godoc.org/github.com/charmixer/go-flags)
 
 This library provides similar functionality to the builtin flag library of
 go, but provides much more functionality and nicer formatting. From the
@@ -16,7 +16,7 @@ Supported features:
 * Options with short names (-v)
 * Options with long names (--verbose)
 * Options with and without arguments (bool v.s. other type)
-* Options with optional arguments and default values
+* Options with optional arguments
 * Multiple option groups each containing a set of options
 * Generate and print well-formatted help message
 * Passing remaining command line arguments after -- (optional)
@@ -57,9 +57,6 @@ var opts struct {
 
 	// Example of a callback, called each time the option is found.
 	Call func(string) `short:"c" description:"Call phone number"`
-
-	// Example of a required flag
-	Name string `short:"n" long:"name" description:"A name" required:"true"`
 
 	// Example of a flag restricted to a pre-defined set of strings
 	Animal string `long:"animal" choice:"cat" choice:"dog"`
@@ -136,4 +133,4 @@ fmt.Printf("Remaining args: %s\n", strings.Join(args, " "))
 // Remaining args: arg1 arg2 arg3
 ```
 
-More information can be found in the godocs: <http://godoc.org/github.com/jessevdk/go-flags>
+More information can be found in the godocs: <http://godoc.org/github.com/charmixer/go-flags>

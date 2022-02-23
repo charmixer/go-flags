@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"reflect"
-	"sort"
 	"strings"
 	"unicode/utf8"
 )
@@ -310,10 +309,6 @@ func (p *Parser) ParseFlagsArgs(args []string) error {
 		}
 	}
 
-	if p.state.err == nil {
-		p.state.checkRequired(p)
-	}
-
 	return nil
 }
 
@@ -340,6 +335,10 @@ func (p *Parser) ParseArgs(args []string) ([]string, error) {
 	}
 
 	return p.Execute()
+}
+
+func (p *Parser) GetCommand() interface{} {
+	return p.state.command.data
 }
 
 func (p *Parser) Execute() ([]string, error) {
@@ -395,106 +394,6 @@ func (p *parseState) peek() string {
 	}
 
 	return p.args[0]
-}
-
-func (p *parseState) checkRequired(parser *Parser) error {
-	c := parser.Command
-
-	var required []*Option
-
-	for c != nil {
-		c.eachGroup(func(g *Group) {
-			for _, option := range g.options {
-				if !option.isSet && option.Required {
-					required = append(required, option)
-				}
-			}
-		})
-
-		c = c.Active
-	}
-
-	if len(required) == 0 {
-		if len(p.positional) > 0 {
-			var reqnames []string
-
-			for _, arg := range p.positional {
-				argRequired := (!arg.isRemaining() && p.command.ArgsRequired) || arg.Required != -1 || arg.RequiredMaximum != -1
-
-				if !argRequired {
-					continue
-				}
-
-				if arg.isRemaining() {
-					if arg.value.Len() < arg.Required {
-						var arguments string
-
-						if arg.Required > 1 {
-							arguments = "arguments, but got only " + fmt.Sprintf("%d", arg.value.Len())
-						} else {
-							arguments = "argument"
-						}
-
-						reqnames = append(reqnames, "`"+arg.Name+" (at least "+fmt.Sprintf("%d", arg.Required)+" "+arguments+")`")
-					} else if arg.RequiredMaximum != -1 && arg.value.Len() > arg.RequiredMaximum {
-						if arg.RequiredMaximum == 0 {
-							reqnames = append(reqnames, "`"+arg.Name+" (zero arguments)`")
-						} else {
-							var arguments string
-
-							if arg.RequiredMaximum > 1 {
-								arguments = "arguments, but got " + fmt.Sprintf("%d", arg.value.Len())
-							} else {
-								arguments = "argument"
-							}
-
-							reqnames = append(reqnames, "`"+arg.Name+" (at most "+fmt.Sprintf("%d", arg.RequiredMaximum)+" "+arguments+")`")
-						}
-					}
-				} else {
-					reqnames = append(reqnames, "`"+arg.Name+"`")
-				}
-			}
-
-			if len(reqnames) == 0 {
-				return nil
-			}
-
-			var msg string
-
-			if len(reqnames) == 1 {
-				msg = fmt.Sprintf("the required argument %s was not provided", reqnames[0])
-			} else {
-				msg = fmt.Sprintf("the required arguments %s and %s were not provided",
-					strings.Join(reqnames[:len(reqnames)-1], ", "), reqnames[len(reqnames)-1])
-			}
-
-			p.err = newError(ErrRequired, msg)
-			return p.err
-		}
-
-		return nil
-	}
-
-	names := make([]string, 0, len(required))
-
-	for _, k := range required {
-		names = append(names, "`"+k.String()+"'")
-	}
-
-	sort.Strings(names)
-
-	var msg string
-
-	if len(names) == 1 {
-		msg = fmt.Sprintf("the required flag %s was not specified", names[0])
-	} else {
-		msg = fmt.Sprintf("the required flags %s and %s were not specified",
-			strings.Join(names[:len(names)-1], ", "), names[len(names)-1])
-	}
-
-	p.err = newError(ErrRequired, msg)
-	return p.err
 }
 
 func (p *parseState) estimateCommand() error {
